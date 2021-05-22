@@ -1,6 +1,7 @@
 import numpy as np
 import os
 from PIL import Image
+import cv2
 import random
 from xml_tools import create_base_xml, create_object_xml
 
@@ -181,14 +182,16 @@ class Frame:
         
     def create_annotations(self):
         delta = 5
+        count = 0
         for tile_mitosis in self.tiles_mitosis:
             image = tile_mitosis.tile
+            tree = create_base_xml(image)
             for record in tile_mitosis.records:
-                tree = create_base_xml(image)
                 coordinates = (record.x - delta, record.x  + delta, record.y - delta, record.y + delta)
                 tree = create_object_xml(tree,coordinates)
-                tree.write(os.path.join(self.path_annotations,f"{self.filename.replace('.tiff','.xml')}_prueba.xml"))
-                break
+            tree.write(os.path.join(self.path_annotations,f"{self.filename.replace('.tiff','')}_{count}.xml"))
+            cv2.imwrite(f"{self.filename.replace('.tiff','')}_{count}.jpg",image) 
+            count += 1
 
 ## Funciones a parte ##
 def get_cell_coordinates_in_tile(x1_tile : int, y1_tile : int,x_record: int, y_record: int, confidence) -> Record:

@@ -21,7 +21,7 @@ def create_base_xml(image):
   height = ET.SubElement(size, "height")
   height.text = str(int(image.shape[1]))
   depth = ET.SubElement(size, "depth")
-  depth.text = ''
+  depth.text = ' '
   segmented = ET.SubElement(root, "segmented") 
   segmented.text = '0'
   tree._setroot(root)
