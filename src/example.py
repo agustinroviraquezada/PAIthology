@@ -11,6 +11,8 @@ NUM_TILES = 10
 path_image = 'C:\\Users\\maria\\Desktop\\mitosis\\images\\A17_00Db.tiff'
 path_annotations = 'C:\\Users\\maria\\Desktop\\mitosis\\annotations'
 os.makedirs(path_annotations,exist_ok=True)
+os.makedirs(os.path.join(path_annotations,'annotations'),exist_ok=True)
+os.makedirs(os.path.join(path_annotations,'images'),exist_ok=True)
 cells = [[400,400,1.0]]
 
 frame = Frame(path=path_image,cells=cells,tile_size=TILE_SIZE,num_tiles=NUM_TILES,path_annotations=path_annotations)
