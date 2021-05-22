@@ -77,6 +77,7 @@ class PatchGenerator():
             y2_candidate = y_choice + (random.choice(choice))
 
             if (0 < x_choice[0] < x_image) and (0 < y_choice[0] < y_image) \
+            and (0 < x2_candidate[0] < x_image) and (0 < y2_candidate[0] < y_image) \
             and (x_mitotic - self.tile_size < x2_candidate < x_mitotic + self.tile_size) \
             and (y_mitotic - self.tile_size < y2_candidate < y_mitotic + self.tile_size):
                 coord_x1.append(x_choice)
@@ -111,7 +112,6 @@ class PatchGenerator():
                 x2_mitotic = int(max(pos_x1_coord[i], pos_x2_coord[i]))
                 y1_mitotic = int(min(pos_y1_coord[i], pos_y2_coord[i]))
                 y2_mitotic = int(max(pos_y1_coord[i], pos_y2_coord[i]))
-    
                 
                 individual_mitotic_patch = self.image[x1_mitotic:x2_mitotic, y1_mitotic:y2_mitotic, :]
                 tile_mitosis = Tile(individual_mitotic_patch)
