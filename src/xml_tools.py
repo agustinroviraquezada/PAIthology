@@ -1,18 +1,14 @@
-import os
-import pandas as pd
-import matplotlib.pyplot as plt
 import xml.etree.ElementTree as ET
-from xml.etree.ElementTree import Element
 
-def create_base_xml(image):
+def create_base_xml(frame,image):
   tree = ET.ElementTree()
   root = ET.Element("annotation")
   folder = ET.SubElement(root, "folder")
-  folder.text = 'folder'
+  folder.text = str(frame.path)
   filename = ET.SubElement(root, "filename")
-  filename.text = 'filename'
+  filename.text = str(frame.filename)
   path = ET.SubElement(root, "path")
-  path.text ='path'
+  path.text =str(frame.path)
   source = ET.SubElement(root, "source")
   ET.SubElement(source, "database").text = "Unknown"
   size = ET.SubElement(root, "size")
@@ -21,7 +17,7 @@ def create_base_xml(image):
   height = ET.SubElement(size, "height")
   height.text = str(int(image.shape[1]))
   depth = ET.SubElement(size, "depth")
-  depth.text = ' '
+  depth.text = str(int(3))
   segmented = ET.SubElement(root, "segmented") 
   segmented.text = '0'
   tree._setroot(root)
