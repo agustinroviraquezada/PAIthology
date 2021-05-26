@@ -14,7 +14,7 @@ class PatchGenerator():
         self.mitotic_coordinates = frame.records
     
 
-    def generate_negative_patches(self, coordinates):
+    def generate_negative_patches(self,coordinates):
         """Generates random tiles that do NOT contain the mitotic coordinates. We pick x1 and y1
         randomly within the range of the whole image.
         We then randomly choose x2 and y2 if the patch does not contain the mitotic coordinates,
@@ -37,12 +37,12 @@ class PatchGenerator():
             #generate random x2 and y2 candidates, we then choose the ones that do
             # not contain the mitotic coordinates
             x2_candidate = x_choice + (random.choice(choice))
-            y2_candidate = y_choice + (random.choice(choice))
-
-            if (0 < x2_candidate < x_image) \
-                    and (0 < y2_candidate < y_image) \
-                    and (x2_candidate not in range(x_mitotic-self.tile_size, x_mitotic+self.tile_size)) \
-                    and (y2_candidate not in range(y_mitotic-self.tile_size, y_mitotic+self.tile_size)):
+            y2_candidate = y_choice + (random.choice(choice))                  
+            # search if choice of coordinates inside boundaries and if valid centre of \
+            # coordinates. This is achieved when the value of frame.frame_mask == 0. 
+            if (0 < x2_candidate[0] < x_image)  and (0 < x_choice[0] +int(self.frame.tile_size/2) < x_image)\
+                and (0 < y2_candidate[0] < y_image) and (0 < y_choice[0] +int(self.frame.tile_size/2) < y_image)\
+                and (self.frame.frame_mask[y_choice[0]+int(self.frame.tile_size/2),x_choice[0]+int(self.frame.tile_size/2)] == 0):
                 coord_x1.append(x_choice)
                 coord_y1.append(y_choice)
 
@@ -76,8 +76,10 @@ class PatchGenerator():
             x2_candidate = x_choice + (random.choice(choice))
             y2_candidate = y_choice + (random.choice(choice))
 
-            if (x_mitotic - self.tile_size < x2_candidate < x_mitotic + self.tile_size) and \
-                    (y_mitotic - self.tile_size < y2_candidate < y_mitotic + self.tile_size):
+            if (0 < x_choice[0] < x_image) and (0 < y_choice[0] < y_image) \
+            and (0 < x2_candidate[0] < x_image) and (0 < y2_candidate[0] < y_image) \
+            and (x_mitotic - self.tile_size < x2_candidate < x_mitotic + self.tile_size) \
+            and (y_mitotic - self.tile_size < y2_candidate < y_mitotic + self.tile_size):
                 coord_x1.append(x_choice)
                 coord_y1.append(y_choice)
 
@@ -89,7 +91,7 @@ class PatchGenerator():
     
     
 
-    def create_patches(self):
+    def create_patches(self,frame):
         """calls both functions for generating positive and negative patches and stores the images in
         two separate lists (lists of numpy arrays)"""
         
@@ -110,13 +112,23 @@ class PatchGenerator():
                 x2_mitotic = int(max(pos_x1_coord[i], pos_x2_coord[i]))
                 y1_mitotic = int(min(pos_y1_coord[i], pos_y2_coord[i]))
                 y2_mitotic = int(max(pos_y1_coord[i], pos_y2_coord[i]))
-    
                 
                 individual_mitotic_patch = self.image[x1_mitotic:x2_mitotic, y1_mitotic:y2_mitotic, :]
                 tile_mitosis = Tile(individual_mitotic_patch)
                 record_tile = get_cell_coordinates_in_tile(x1_mitotic,y1_mitotic,\
                               coordinates[0],coordinates[1],confidence)
                 tile_mitosis.update_records(record_tile)
+                # Checkear si que el tile creado contiene mas de una céluala mitótica.
+                for record in self.frame.records:
+                    if (x1_mitotic < record.x <x2_mitotic) \
+                    and (y1_mitotic < record.y <y2_mitotic) \
+                    and (m_coordinates.x != record.x) \
+                    and (m_coordinates.y != record.y):
+                        record_tile_plus = get_cell_coordinates_in_tile(x1_mitotic,y1_mitotic,\
+                              record.x,record.y,record.confidence)
+                        tile_mitosis.update_records(record_tile_plus)
+                
+                
                 self.frame.update_tiles_mitosis(tile_mitosis)
                 
 
@@ -164,16 +176,24 @@ class Frame:
         self.tiles_not_mitosis = []
         self.records = []
         self.path_annotations = path_annotations
-
-    def get_all_tiles(self):
-        patchgenerator = PatchGenerator(self, self.tile_size,self.num_tiles)
-        patchgenerator.create_patches()
-
+        self.frame_mask = []
+        
     def get_records(self):
        for cell in self.cells:
            record = Record(cell[0],cell[1],cell[2])
            self.records += [record]
         
+    def create_mask(self):
+        mask = np.zeros((self.frame.size[1],self.frame.size[0]))
+        for record in self.records:
+            mask[int(record.x-(self.tile_size/2)):int(record.x+(self.tile_size/2)),
+                 int(record.y-(self.tile_size/2)):int(record.y+(self.tile_size/2))] = 1
+        self.frame_mask = mask
+
+    def get_all_tiles(self):
+        patchgenerator = PatchGenerator(self, self.tile_size,self.num_tiles)
+        patchgenerator.create_patches(self)
+
     def update_tiles_mitosis(self,tile):
         self.tiles_mitosis += [tile]
     
@@ -185,12 +205,19 @@ class Frame:
         count = 0
         for tile_mitosis in self.tiles_mitosis:
             image = tile_mitosis.tile
-            tree = create_base_xml(image)
+            tree = create_base_xml(self,image)
             for record in tile_mitosis.records:
                 coordinates = (record.x - delta, record.x  + delta, record.y - delta, record.y + delta)
                 tree = create_object_xml(tree,coordinates)
-            tree.write(os.path.join(self.path_annotations,f"{self.filename.replace('.tiff','')}_{count}.xml"))
-            cv2.imwrite(f"{self.filename.replace('.tiff','')}_{count}.jpg",image) 
+            tree.write(os.path.join(self.path_annotations,'annotations',f"{self.filename.replace('.tiff','')}_mitosis_{count}.xml"))
+            cv2.imwrite(os.path.join(self.path_annotations,'images',f"{self.filename.replace('.tiff','')}_mitosis_{count}.jpg"),image) 
+            count += 1
+        count = 0
+        for tile_not_mitosis in self.tiles_not_mitosis:
+            image_not = tile_not_mitosis.tile
+            tree = create_base_xml(self,image)
+            tree.write(os.path.join(self.path_annotations,'annotations',f"{self.filename.replace('.tiff','')}_notmitosis_{count}.xml"))
+            cv2.imwrite(os.path.join(self.path_annotations,'images',f"{self.filename.replace('.tiff','')}_notmitosis_{count}.jpg"),image_not) 
             count += 1
 
 ## Funciones a parte ##
