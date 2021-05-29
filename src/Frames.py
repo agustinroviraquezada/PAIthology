@@ -2,13 +2,8 @@ import numpy as np
 import os
 from PIL import Image
 import cv2
-import pydrive
 import random
-import pandas as pd
-import glob
-import ast
-import os
-from src.xml_tools import create_base_xml, create_object_xml
+from xml_tools import create_base_xml, create_object_xml
 
 class PatchGenerator():
     def __init__(self, frame, tile_size, num_tiles):
@@ -45,23 +40,19 @@ class PatchGenerator():
             y2_candidate = y_choice + (random.choice(choice))                  
             # search if choice of coordinates inside boundaries and if valid centre of \
             # coordinates. This is achieved when the value of frame.frame_mask == 0. 
-            if (0 < x2_candidate < x_image) \
-                and (0 < y2_candidate < y_image) \
-                and (x2_candidate not in range(x_mitotic - self.tile_size, x_mitotic + self.tile_size)) \
-                and (y2_candidate not in range(y_mitotic - self.tile_size, y_mitotic + self.tile_size))\
+            if (0 < x2_candidate[0] < x_image) \
+                and (0 < x_choice[0] +int(self.frame.tile_size/2) < x_image)\
+                and (0 < y2_candidate[0] < y_image) and (0 < y_choice[0] +int(self.frame.tile_size/2) < y_image)\
+                and (self.frame.frame_mask[y_choice[0]+int(self.frame.tile_size/2),x_choice[0]+int(self.frame.tile_size/2)] == 0)\
                 and (abs(x_choice - x2_candidate) == self.tile_size and abs(y_choice - y2_candidate == self.tile_size)):
 
-                #and ((self.frame.frame_mask[y_choice[0]+int(self.frame.tile_size/2),
-                    #x_choice[0]+int(self.frame.tile_size/2)] == 0)):
-                a = abs(x_choice - x2_candidate)
-                b= abs(y_choice - y2_candidate)
                 coord_x1.append(x_choice)
                 coord_y1.append(y_choice)
 
                 coord_x2.append(x2_candidate)
                 coord_y2.append(y2_candidate)
                 i += 1
-        return coord_x1, coord_x2, coord_y1, coord_y2
+        return (coord_x1, coord_x2, coord_y1, coord_y2)
 
     def generate_positive_patches(self, coordinates):
         """Generates random tiles that contain the mitotic coordinates. We pick x1 and y1
@@ -92,7 +83,7 @@ class PatchGenerator():
             and (0 < x2_candidate[0] < x_image) and (0 < y2_candidate[0] < y_image) \
             and (x_mitotic - self.tile_size < x2_candidate < x_mitotic + self.tile_size) \
             and (y_mitotic - self.tile_size < y2_candidate < y_mitotic + self.tile_size)\
-            and (abs(x_choice-x2_candidate)== self.tile_size and abs(y_choice-y2_candidate == self.tile_size)):
+            and (abs(x_choice - x2_candidate) == self.tile_size and abs(y_choice - y2_candidate == self.tile_size)):
 
                 coord_x1.append(x_choice)
                 coord_y1.append(y_choice)
@@ -101,7 +92,7 @@ class PatchGenerator():
                 coord_y2.append(y2_candidate)
                 i += 1
 
-        return coord_x1, coord_x2, coord_y1, coord_y2
+        return (coord_x1, coord_x2, coord_y1, coord_y2)
     
     
 
@@ -128,20 +119,18 @@ class PatchGenerator():
                 y2_mitotic = int(max(pos_y1_coord[i], pos_y2_coord[i]))
                 
                 individual_mitotic_patch = self.image[x1_mitotic:x2_mitotic, y1_mitotic:y2_mitotic, :]
-
                 tile_mitosis = Tile(individual_mitotic_patch)
                 record_tile = get_cell_coordinates_in_tile(x1_mitotic,y1_mitotic,\
                               coordinates[0],coordinates[1],confidence)
                 tile_mitosis.update_records(record_tile)
-
                 # Checkear si que el tile creado contiene mas de una céluala mitótica.
                 for record in self.frame.records:
-                    if (x1_mitotic < record.x < x2_mitotic) \
-                    and (y1_mitotic < record.y < y2_mitotic) \
+                    if (x1_mitotic < record.x <x2_mitotic) \
+                    and (y1_mitotic < record.y <y2_mitotic) \
                     and (m_coordinates.x != record.x) \
                     and (m_coordinates.y != record.y):
                         record_tile_plus = get_cell_coordinates_in_tile(x1_mitotic,y1_mitotic,\
-                              record.x, record.y, record.confidence)
+                              record.x,record.y,record.confidence)
                         tile_mitosis.update_records(record_tile_plus)
                 
                 
@@ -152,11 +141,8 @@ class PatchGenerator():
                 x2_not_mitotic = int(max(neg_x1_coord[i], neg_x2_coord[i]))
                 y1_not_mitotic = int(min(neg_y1_coord[i], neg_y2_coord[i]))
                 y2_not_mitotic = int(max(neg_y1_coord[i], neg_y2_coord[i]))
-                c = abs(x1_not_mitotic - x2_not_mitotic)
-                d= abs(y1_not_mitotic - y2_not_mitotic)
-
+    
                 individual_not_mitotic_patch = self.image[x1_not_mitotic:x2_not_mitotic, y1_not_mitotic:y2_not_mitotic, :]
-                e = individual_not_mitotic_patch.shape
                 tile_not_mitosis = Tile(individual_not_mitotic_patch)
                 self.frame.update_tiles_not_mitosis(tile_not_mitosis)
     
@@ -185,9 +171,9 @@ class Frame:
     def __init__(self,path,cells,tile_size,num_tiles=10,path_annotations=None):
         self.path = path
         self.filename = os.path.basename(path)
-        self.frame = Image.open(path)
-        self.width = self.frame.size[0]
-        self.height = self.frame.size[1]
+        self.frame = cv2.imread(path)
+        self.width = self.frame.shape[0]
+        self.height = self.frame.shape[1]
         self.tile_size = tile_size
         self.num_tiles = num_tiles
         self.cells = cells
@@ -203,7 +189,7 @@ class Frame:
            self.records += [record]
         
     def create_mask(self):
-        mask = np.zeros((self.frame.size[1],self.frame.size[0]))
+        mask = np.zeros((self.height,self.width))
         for record in self.records:
             mask[int(record.x-(self.tile_size/2)):int(record.x+(self.tile_size/2)),
                  int(record.y-(self.tile_size/2)):int(record.y+(self.tile_size/2))] = 1
@@ -244,4 +230,5 @@ def get_cell_coordinates_in_tile(x1_tile : int, y1_tile : int,x_record: int, y_r
         x_tile = x_record - x1_tile
         y_tile = y_record - y1_tile    
         return Record(x_tile, y_tile, confidence)
+
 
