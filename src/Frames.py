@@ -40,9 +40,12 @@ class PatchGenerator():
             y2_candidate = y_choice + (random.choice(choice))                  
             # search if choice of coordinates inside boundaries and if valid centre of \
             # coordinates. This is achieved when the value of frame.frame_mask == 0. 
-            if (0 < x2_candidate[0] < x_image) and (0 < x_choice[0] +int(self.frame.tile_size/2) < x_image)\
+            if (0 < x2_candidate[0] < x_image) \
+                and (0 < x_choice[0] +int(self.frame.tile_size/2) < x_image)\
                 and (0 < y2_candidate[0] < y_image) and (0 < y_choice[0] +int(self.frame.tile_size/2) < y_image)\
-                and (self.frame.frame_mask[y_choice[0]+int(self.frame.tile_size/2),x_choice[0]+int(self.frame.tile_size/2)] == 0):
+                and (self.frame.frame_mask[y_choice[0]+int(self.frame.tile_size/2),x_choice[0]+int(self.frame.tile_size/2)] == 0)\
+                and (abs(x_choice - x2_candidate) == self.tile_size and abs(y_choice - y2_candidate == self.tile_size)):
+
                 coord_x1.append(x_choice)
                 coord_y1.append(y_choice)
 
@@ -79,7 +82,9 @@ class PatchGenerator():
             if (0 < x_choice[0] < x_image) and (0 < y_choice[0] < y_image) \
             and (0 < x2_candidate[0] < x_image) and (0 < y2_candidate[0] < y_image) \
             and (x_mitotic - self.tile_size < x2_candidate < x_mitotic + self.tile_size) \
-            and (y_mitotic - self.tile_size < y2_candidate < y_mitotic + self.tile_size):
+            and (y_mitotic - self.tile_size < y2_candidate < y_mitotic + self.tile_size)\
+            and (abs(x_choice - x2_candidate) == self.tile_size and abs(y_choice - y2_candidate == self.tile_size)):
+
                 coord_x1.append(x_choice)
                 coord_y1.append(y_choice)
 
@@ -166,9 +171,9 @@ class Frame:
     def __init__(self,path,cells,tile_size,num_tiles=10,path_annotations=None):
         self.path = path
         self.filename = os.path.basename(path)
-        self.frame = Image.open(path)
-        self.width = self.frame.size[0]
-        self.height = self.frame.size[1]
+        self.frame = cv2.imread(path)
+        self.width = self.frame.shape[0]
+        self.height = self.frame.shape[1]
         self.tile_size = tile_size
         self.num_tiles = num_tiles
         self.cells = cells
@@ -184,7 +189,7 @@ class Frame:
            self.records += [record]
         
     def create_mask(self):
-        mask = np.zeros((self.frame.size[1],self.frame.size[0]))
+        mask = np.zeros((self.height,self.width))
         for record in self.records:
             mask[int(record.x-(self.tile_size/2)):int(record.x+(self.tile_size/2)),
                  int(record.y-(self.tile_size/2)):int(record.y+(self.tile_size/2))] = 1
