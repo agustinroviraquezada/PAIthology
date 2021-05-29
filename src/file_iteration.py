@@ -1,4 +1,4 @@
-from Class_PatchGenerator import PatchGenerator
+from src.Class_PatchGenerator import PatchGenerator
 from PIL import Image
 import os
 import pandas as pd
