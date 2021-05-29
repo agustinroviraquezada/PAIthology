@@ -22,6 +22,7 @@ os.makedirs(os.path.join(path_annotations,'images'),exist_ok=True)
 cells = [[400,400,1.0]]
 
 frame = Frame(path=path_image,cells=cells,tile_size=TILE_SIZE,num_tiles=NUM_TILES,path_annotations=path_annotations)
+frame.create_mask()
 frame.get_records()
 frame.get_all_tiles()
 frame.create_annotations()

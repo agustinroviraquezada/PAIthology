@@ -3,7 +3,7 @@ import os
 from PIL import Image
 import cv2
 import random
-from xml_tools import create_base_xml, create_object_xml
+from src.xml_tools import create_base_xml, create_object_xml
 
 class PatchGenerator():
     def __init__(self, frame, tile_size, num_tiles):
