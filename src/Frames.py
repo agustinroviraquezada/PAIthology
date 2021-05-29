@@ -19,7 +19,7 @@ class PatchGenerator():
         randomly within the range of the whole image.
         We then randomly choose x2 and y2 if the patch does not contain the mitotic coordinates,
         we discard it otherwise"""
-        y_image, x_image, _ = self.image.shape
+        x_image, y_image, _ = self.image.shape
         x_mitotic, y_mitotic = coordinates
 
         coord_x1 = []
@@ -40,7 +40,7 @@ class PatchGenerator():
             y2_candidate = y_choice + (random.choice(choice))                  
             # search if choice of coordinates inside boundaries and if valid centre of \
             # coordinates. This is achieved when the value of frame.frame_mask == 0. 
-            if (0 < x2_candidate[0] < x_image)  and (0 < x_choice[0] +int(self.frame.tile_size/2) < x_image)\
+            if (0 < x2_candidate[0] < x_image) and (0 < x_choice[0] +int(self.frame.tile_size/2) < x_image)\
                 and (0 < y2_candidate[0] < y_image) and (0 < y_choice[0] +int(self.frame.tile_size/2) < y_image)\
                 and (self.frame.frame_mask[y_choice[0]+int(self.frame.tile_size/2),x_choice[0]+int(self.frame.tile_size/2)] == 0):
                 coord_x1.append(x_choice)
@@ -55,7 +55,7 @@ class PatchGenerator():
         """Generates random tiles that contain the mitotic coordinates. We pick x1 and y1
         randomly within the range of the mitotic coordinates, given a tile size. We then randomly choose
         x2 and y2 if the patch contains the mitotic coordinates, we discard it otherwise"""
-        y_image, x_image, _ = self.image.shape
+        x_image, y_image, _ = self.image.shape
         x_mitotic, y_mitotic = coordinates
 
         coord_x1 = []
