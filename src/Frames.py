@@ -3,7 +3,7 @@ import os
 from PIL import Image
 import cv2
 import random
-from xml_tools import create_base_xml, create_object_xml
+from src.xml_tools import create_base_xml, create_object_xml
 
 class PatchGenerator():
     def __init__(self, frame, tile_size, num_tiles):
@@ -118,6 +118,7 @@ class PatchGenerator():
                 record_tile = get_cell_coordinates_in_tile(x1_mitotic,y1_mitotic,\
                               coordinates[0],coordinates[1],confidence)
                 tile_mitosis.update_records(record_tile)
+
                 # Checkear si que el tile creado contiene mas de una céluala mitótica.
                 for record in self.frame.records:
                     if (x1_mitotic < record.x <x2_mitotic) \
