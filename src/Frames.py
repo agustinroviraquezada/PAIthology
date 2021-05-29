@@ -49,7 +49,7 @@ class PatchGenerator():
                 and (0 < y2_candidate < y_image) \
                 and (x2_candidate not in range(x_mitotic - self.tile_size, x_mitotic + self.tile_size)) \
                 and (y2_candidate not in range(y_mitotic - self.tile_size, y_mitotic + self.tile_size))\
-                and (abs(x_choice - x2_candidate) == 256 and abs(y_choice - y2_candidate == 256)):
+                and (abs(x_choice - x2_candidate) == self.tile_size and abs(y_choice - y2_candidate == self.tile_size)):
 
                 #and ((self.frame.frame_mask[y_choice[0]+int(self.frame.tile_size/2),
                     #x_choice[0]+int(self.frame.tile_size/2)] == 0)):
@@ -92,7 +92,7 @@ class PatchGenerator():
             and (0 < x2_candidate[0] < x_image) and (0 < y2_candidate[0] < y_image) \
             and (x_mitotic - self.tile_size < x2_candidate < x_mitotic + self.tile_size) \
             and (y_mitotic - self.tile_size < y2_candidate < y_mitotic + self.tile_size)\
-            and (abs(x_choice-x2_candidate)== 256 and abs(y_choice-y2_candidate == 256)):
+            and (abs(x_choice-x2_candidate)== self.tile_size and abs(y_choice-y2_candidate == self.tile_size)):
 
                 coord_x1.append(x_choice)
                 coord_y1.append(y_choice)
