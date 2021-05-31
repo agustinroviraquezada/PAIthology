@@ -210,7 +210,7 @@ class Frame:
         count = 0
         for tile_mitosis in self.tiles_mitosis:
             image = tile_mitosis.tile
-            tree = create_base_xml(self,image,f"{self.filename.replace('.tiff','')}_mitosis_{count}.xml")
+            tree = create_base_xml(self,image,f"{self.filename.replace('.tiff','')}_mitosis_{count}.jpg")
             for record in tile_mitosis.records:
                 coordinates = (record.x - delta, record.x  + delta, record.y - delta, record.y + delta)
                 tree = create_object_xml(tree,coordinates)
@@ -220,7 +220,7 @@ class Frame:
         count = 0
         for tile_not_mitosis in self.tiles_not_mitosis:
             image_not = tile_not_mitosis.tile
-            tree = create_base_xml(self,image,f"{self.filename.replace('.tiff','')}_notmitosis_{count}.xml")
+            tree = create_base_xml(self,image,f"{self.filename.replace('.tiff','')}_notmitosis_{count}.jpg")
             tree.write(os.path.join(self.path_annotations,'annotations',f"{self.filename.replace('.tiff','')}_notmitosis_{count}.xml"))
             cv2.imwrite(os.path.join(self.path_annotations,'images',f"{self.filename.replace('.tiff','')}_notmitosis_{count}.jpg"),image_not) 
             count += 1
