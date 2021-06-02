@@ -1,12 +1,12 @@
 import xml.etree.ElementTree as ET
 
-def create_base_xml(frame,image):
+def create_base_xml(frame,image,name):
   tree = ET.ElementTree()
   root = ET.Element("annotation")
   folder = ET.SubElement(root, "folder")
   folder.text = str(frame.path)
   filename = ET.SubElement(root, "filename")
-  filename.text = str(frame.filename)
+  filename.text = str(name)
   path = ET.SubElement(root, "path")
   path.text =str(frame.path)
   source = ET.SubElement(root, "source")
