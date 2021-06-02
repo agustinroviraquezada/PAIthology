@@ -14,9 +14,11 @@ from Frames import Frame
 TILE_SIZE = 256
 NUM_TILES = 10
 
-path_labels = '/content/drive/MyDrive/pAItologos/src/01_GIT/PAIthology/src/Labels.xlsx'
-path_annotations = '/content/drive/MyDrive/pAItologos/processed_data/dataset'
-path_images = '/content/drive/MyDrive/pAItologos/raw_data/'
+path_labels = "C:\\Users\\pasto\\projects\\ai_saturdays_proyecto\\Labels.xlsx"
+
+path_image = "C:\\Users\\pasto\\projects\\ai_saturdays_proyecto\\A17_01Cb.tiff"
+path_annotations = "C:\\Users\\pasto\\projects\\ai_saturdays_proyecto"
+
 os.makedirs(path_annotations,exist_ok=True)
 os.makedirs(os.path.join(path_annotations,'annotations'),exist_ok=True)
 os.makedirs(os.path.join(path_annotations,'images'),exist_ok=True)
