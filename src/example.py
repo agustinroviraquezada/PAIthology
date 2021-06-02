@@ -21,6 +21,9 @@ os.makedirs(os.path.join(path_annotations,'images'),exist_ok=True)
 
 cells = [[400,400,1.0]]
 
+path_image = 'X:\\projects\\PAIthology\\src\\raw_data\\A03\\x40\\A03_00Ad.tiff'
+path_annotations = "X:\\projects\\PAIthology\\src\\processed_data\\dataset_prueba"
+
 frame = Frame(path=path_image,cells=cells,tile_size=TILE_SIZE,num_tiles=NUM_TILES,path_annotations=path_annotations)
 frame.create_mask()
 frame.get_records()

@@ -184,9 +184,24 @@ class Frame:
         self.frame_mask = []
         
     def get_records(self):
-       for cell in self.cells:
+        if len(self.cells) == 1:
+            cell = self.cells[0]
+            record = Record(cell[0], cell[1], cell[2])
+            self.records += [record]
+        else:
+            for i in range(len(self.cells)):
+                cell = self.cells[i]
+                record = Record(cell[0], cell[1], cell[2])
+                self.records += [record] #Aqui va bien hasta la última iteración de la primera Tile con multicelula
+        """multi_cell = any(isinstance(i, list) for i in self.cells)
+        if multi_cell:
+            for i in range(len(self.cells)):
+                cell = self.cells[i]
+                record = Record(cell[0],cell[1],cell[2])
+                self.records += [record]
+        else:
            record = Record(cell[0],cell[1],cell[2])
-           self.records += [record]
+           self.records += [record]"""
         
     def create_mask(self):
         mask = np.zeros((self.height,self.width))
