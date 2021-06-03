@@ -22,22 +22,25 @@ os.makedirs(os.path.join(path_annotations,'annotations'),exist_ok=True)
 os.makedirs(os.path.join(path_annotations,'images'),exist_ok=True)
 
 labels = pd.read_excel(path_labels,dtype={"MPoint":object})
-labels_mitosis = labels[labels['Mitosis']==True].reset_index()
+labels_mitosis = labels[(labels['Mitosis']==True)].reset_index()
+labels_mitosis = labels_mitosis[(labels_mitosis['SubImage']==1)].reset_index()
 
 for i, row in labels_mitosis.iterrows():
     filename = f'{row["Combinacion"]}.tiff'
     a = os.path.join(path_images,'*','x40', filename)
-    path_image = glob.glob(os.path.join(path_images,'*','x40', filename))
+    path_image = glob.glob(os.path.join(path_images,'*','x40', filename), recursive=True)
     if os.path.exists(path_image[0]):
-        print(filename)
         cells = row["MPoint"]
         cells = ast.literal_eval(cells)
-        #for i in range(len(cells)):
+        print(filename)
+        print(i)
         frame = Frame(path=path_image[0],cells=cells,tile_size=TILE_SIZE,num_tiles=NUM_TILES,path_annotations=path_annotations)
         frame.get_records() #peta en el primer frame con subimages
         frame.create_mask()
         frame.get_all_tiles()
-        frame.create_annotations()
+        frame.create_annotations() #Ahora peta en create annotations
+    else:
+        continue
 
 import shutil
 
