@@ -72,15 +72,15 @@ class PatchGenerator():
 
         while i < self.num_tiles:
             #we get x1,y1 randomly within the range of the tile size, centered on the mitotic coordinates
-            x_choice = np.random.randint(x_mitotic - self.tile_size, x_mitotic + self.tile_size, 1)
-            y_choice = np.random.randint(y_mitotic - self.tile_size, y_mitotic + self.tile_size, 1)
+            x_choice = np.random.randint(max((x_mitotic - self.tile_size),0), min((x_mitotic + self.tile_size),y_image), 1)
+            y_choice = np.random.randint(max((y_mitotic - self.tile_size),0), min((y_mitotic + self.tile_size),y_image), 1)
 
             #We generate x2 and y2 candidates, and we check if the mitotic coordinates are contained in the patch
             x2_candidate = x_choice + (random.choice(choice))
             y2_candidate = y_choice + (random.choice(choice))
 
-            if (0 < x_choice[0] < x_image) and (0 < y_choice[0] < y_image) \
-            and (0 < x2_candidate[0] < x_image) and (0 < y2_candidate[0] < y_image) \
+
+            if (x2_candidate[0] in range(0, x_image)) and (y2_candidate[0] in range(0, y_image)) \
             and (x_mitotic - self.tile_size < x2_candidate < x_mitotic + self.tile_size) \
             and (y_mitotic - self.tile_size < y2_candidate < y_mitotic + self.tile_size)\
             and (abs(x_choice - x2_candidate) == self.tile_size and abs(y_choice - y2_candidate == self.tile_size)):
@@ -92,7 +92,11 @@ class PatchGenerator():
                 coord_y2.append(y2_candidate)
                 i += 1
 
+            else:
+                continue
+
         return (coord_x1, coord_x2, coord_y1, coord_y2)
+
     
     
 
@@ -193,15 +197,6 @@ class Frame:
                 cell = self.cells[i]
                 record = Record(cell[0], cell[1], cell[2])
                 self.records += [record] #Aqui va bien hasta la última iteración de la primera Tile con multicelula
-        """multi_cell = any(isinstance(i, list) for i in self.cells)
-        if multi_cell:
-            for i in range(len(self.cells)):
-                cell = self.cells[i]
-                record = Record(cell[0],cell[1],cell[2])
-                self.records += [record]
-        else:
-           record = Record(cell[0],cell[1],cell[2])
-           self.records += [record]"""
         
     def create_mask(self):
         mask = np.zeros((self.height,self.width))
