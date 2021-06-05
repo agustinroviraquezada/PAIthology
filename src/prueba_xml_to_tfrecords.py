@@ -23,7 +23,7 @@ os.makedirs(os.path.join(path_annotations,'images'),exist_ok=True)
 
 labels = pd.read_excel(path_labels,dtype={"MPoint":object})
 labels_mitosis = labels[(labels['Mitosis']==True)].reset_index()
-labels_mitosis = labels_mitosis[(labels_mitosis['SubImage']==1)].reset_index()
+#labels_mitosis = labels_mitosis[(labels_mitosis['SubImage']==1)].reset_index()
 
 for i, row in labels_mitosis.iterrows():
     filename = f'{row["Combinacion"]}.tiff'

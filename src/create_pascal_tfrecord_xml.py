@@ -140,6 +140,10 @@ def main(_):
 if __name__ == '__main__':
 
     app.run(main)
+    #el record tiene 13834 elementos, para el train/test split
+
+    """tf.compat.v1.enable_eager_execution
+    print(sum(1 for _ in tf.data.TFRecordDataset("X:\\projects\\PAIthology\\src\\processed_data\\dataset\\tfrecord\\tfrecord")))"""
 
     """raw_dataset = tf.data.TFRecordDataset(
         "X:\\projects\\PAIthology\\src\\processed_data\\dataset\\tfrecord\\tfrecord")
