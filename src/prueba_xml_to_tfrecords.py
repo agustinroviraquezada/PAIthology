@@ -29,6 +29,7 @@ for i, row in labels_mitosis.iterrows():
     filename = f'{row["Combinacion"]}.tiff'
     a = os.path.join(path_images,'*','x40', filename)
     path_image = glob.glob(os.path.join(path_images,'*','x40', filename), recursive=True)
+
     if os.path.exists(path_image[0]):
         cells = row["MPoint"]
         cells = ast.literal_eval(cells)
