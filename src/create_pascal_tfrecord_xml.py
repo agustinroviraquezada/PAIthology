@@ -37,7 +37,7 @@ from src import tfrecord_util
 FLAGS = flags.FLAGS
 
 def define_flags():
-    flags.DEFINE_string('output_path', '', 'Path to output TFRecord')
+    flags.DEFINE_string('output_path', 'X:\\projects\\PAIthology\\src\\processed_data\\dataset\\tfrecord', 'Path to output TFRecord')
     flags.DEFINE_string('image_dir', '', 'Path to image directory.')
     flags.DEFINE_string('annotations_dir', '', 'Path to annotations directory.')
 
@@ -78,6 +78,7 @@ def dict_to_tf_example(data, image_dir, label_map_dict):
     ymax = []
     classes = []
     classes_text = []
+
     try:
         for obj in data['object']:
             xmin.append(float(obj['bndbox']['xmin']) / width)
@@ -86,6 +87,8 @@ def dict_to_tf_example(data, image_dir, label_map_dict):
             ymax.append(float(obj['bndbox']['ymax']) / height)
             classes_text.append(obj['name'].encode('utf8'))
             classes.append(label_map_dict[obj['name']])
+            print(data["filename"] + "SUCESS!")
+
     except KeyError:
         print(data['filename'] + ' without objects!')
 
@@ -108,13 +111,12 @@ def dict_to_tf_example(data, image_dir, label_map_dict):
 
 
 def main(_):
-    if not FLAGS.output_path:
-      raise ValueError('output_path cannot be empty.')
-    writer = tf.io.TFRecordWriter(FLAGS.output_path)
+
+    writer = tf.io.TFRecordWriter("X:\\projects\\PAIthology\\src\\processed_data\\dataset\\tfrecord\\tfrecord")
     #label_map_dict = label_map_util.get_label_map_dict(FLAGS.label_map_path)
 
-    image_dir = FLAGS.image_dir
-    annotations_dir = FLAGS.annotations_dir
+    image_dir = 'X:\\projects\\PAIthology\\src\\/processed_data\\dataset\\images'
+    annotations_dir = 'X:\\projects\\PAIthology\\src\\processed_data\\dataset\\annotations'
     logging.info('Reading from dataset: ' + annotations_dir)
     examples_list = os.listdir(annotations_dir)
 
@@ -136,8 +138,16 @@ def main(_):
 
 
 if __name__ == '__main__':
-    define_flags()
+
     app.run(main)
+
+    """raw_dataset = tf.data.TFRecordDataset(
+        "X:\\projects\\PAIthology\\src\\processed_data\\dataset\\tfrecord\\tfrecord")
+
+    for raw_record in raw_dataset.take(1):
+        example = tf.train.Example()
+        example.ParseFromString(raw_record.numpy())
+        print(example)"""
     
 
 # Import needed variables from tensorflow
