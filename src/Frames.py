@@ -206,7 +206,7 @@ class Frame:
         self.tiles_not_mitosis += [tile]
         
     def create_annotations(self):
-        delta = 5
+        delta = 15
         count = 0
         for tile_mitosis in self.tiles_mitosis:
             image = tile_mitosis.tile
