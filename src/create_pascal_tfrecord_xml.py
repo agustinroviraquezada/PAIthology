@@ -33,13 +33,12 @@ from src import tfrecord_util
 #from object_detection.utils import label_map_util
 
 
-
-FLAGS = flags.FLAGS
+"""FLAGS = flags.FLAGS
 
 def define_flags():
     flags.DEFINE_string('output_path', 'X:\\projects\\PAIthology\\src\\processed_data\\dataset\\tfrecord', 'Path to output TFRecord')
     flags.DEFINE_string('image_dir', '', 'Path to image directory.')
-    flags.DEFINE_string('annotations_dir', '', 'Path to annotations directory.')
+    flags.DEFINE_string('annotations_dir', '', 'Path to annotations directory.')"""
 
 
 label_map_dict = {
@@ -111,12 +110,17 @@ def dict_to_tf_example(data, image_dir, label_map_dict):
 
 
 def main(_):
-
-    writer = tf.io.TFRecordWriter("X:\\projects\\PAIthology\\src\\processed_data\\dataset\\tfrecord\\tfrecord")
-    #label_map_dict = label_map_util.get_label_map_dict(FLAGS.label_map_path)
-
+    # I was unable to use the flags and run this from the command line, so I eliminated them and plugged in the paths on my
+    # machine. Change as needed
+    output_dir = "X:\\projects\\PAIthology\\src\\processed_data\\dataset\\tfrecord\\tfrecord"
     image_dir = 'X:\\projects\\PAIthology\\src\\/processed_data\\dataset\\images'
     annotations_dir = 'X:\\projects\\PAIthology\\src\\processed_data\\dataset\\annotations'
+
+    writer = tf.io.TFRecordWriter(output_dir)
+    #label_map_dict = label_map_util.get_label_map_dict(FLAGS.label_map_path)
+
+    image_dir = image_dir
+    annotations_dir = annotations_dir
     logging.info('Reading from dataset: ' + annotations_dir)
     examples_list = os.listdir(annotations_dir)
 
