@@ -9,3 +9,5 @@
 src/processed_data/dataset/annotations/A03_00Aa_mitosis_0.xml
 *.xml
 *.jpg
+*.jpg
+*.xml
