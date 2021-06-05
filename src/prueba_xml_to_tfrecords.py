@@ -12,10 +12,15 @@ from src.Frames import Frame
 TILE_SIZE = 256
 NUM_TILES = 10
 
-path_labels = "X:\\projects\\PAIthology\\src\\Labels.xlsx"
+#path_labels = "X:\\projects\\PAIthology\\src\\Labels.xlsx"
 
-path_images = "X:\\projects\\PAIthology\\src\\raw_data"
-path_annotations = "X:\\projects\\PAIthology\\src\\processed_data\\dataset"
+path_labels = "C:\\Users\\pasto\\projects\\PAIthology\\src\\Labels.xlsx"
+
+#path_images = "X:\\projects\\PAIthology\\src\\raw_data"
+#path_annotations = "X:\\projects\\PAIthology\\src\\processed_data\\dataset"
+
+path_images = "C:\\Users\\pasto\\projects\\PAIthology\\raw_data"
+path_annotations = "C:\\Users\\pasto\\projects\\PAIthology\\processed_data\\dataset"
 
 os.makedirs(path_annotations,exist_ok=True)
 os.makedirs(os.path.join(path_annotations,'annotations'),exist_ok=True)
@@ -41,11 +46,19 @@ for i, row in labels_mitosis.iterrows():
 
 import shutil
 
-path_discards_images = 'X:\\projects\\PAIthology\\src\\processed_data\\dataset\\discards\\images'
+"""path_discards_images = 'X:\\projects\\PAIthology\\src\\processed_data\\dataset\\discards\\images'
 path_discards_annotations = 'X:\\projects\\PAIthology\\src\\processed_data\\dataset\\discards\\annotations'
 path_tiles = 'X:\\projects\\PAIthology\\src\\/processed_data\\dataset\\images'
 path_tiles_annotations = 'X:\\projects\\PAIthology\\src\\processed_data\\dataset\\annotations'
-os.makedirs('X:\\projects\\PAIthology\\src\\processed_data\\dataset\\discards\\', exist_ok=True)
+os.makedirs('X:\\projects\\PAIthology\\src\\processed_data\\dataset\\discards\\', exist_ok=True)"""
+
+path_discards_images = 'C:\\Users\\pasto\\projects\\PAIthology\\processed_data\\dataset\\discards\\images'
+path_discards_annotations = 'C:\\Users\\pasto\\projects\\PAIthology\\processed_data\\dataset\\discards\\annotations'
+path_tiles = 'C:\\Users\\pasto\\projects\\PAIthology\\processed_data\\dataset\\images'
+path_tiles_annotations = 'C:\\Users\\pasto\\projects\\PAIthology\\processed_data\\dataset\\annotations'
+os.makedirs('C:\\Users\\pasto\\projects\\PAIthology\\processed_data\\dataset\\discards\\', exist_ok=True)
+
+
 os.makedirs(path_discards_images, exist_ok=True)
 os.makedirs(path_discards_annotations, exist_ok=True)
 imgs = os.listdir(path_tiles)
