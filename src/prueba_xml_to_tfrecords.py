@@ -71,4 +71,5 @@ os.makedirs(output_dir,exist_ok=True)
 
 output_model = '/content/drive/MyDrive/pAItologos/processed_data/dataset/output'
 os.makedirs(output_model, exist_ok=True)
+#c
 
