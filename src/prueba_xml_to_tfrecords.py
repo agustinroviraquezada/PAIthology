@@ -10,12 +10,12 @@ import glob
 from src.Frames import Frame
 
 TILE_SIZE = 256
-NUM_TILES = 10
+NUM_TILES = 1
 
 path_labels = "X:\\projects\\PAIthology\\src\\Labels.xlsx"
 
 path_images = "X:\\projects\\PAIthology\\src\\raw_data"
-path_annotations = "X:\\projects\\PAIthology\\src\\processed_data\\dataset"
+path_annotations = "X:\\projects\\PAIthology\\src\\processed_data\\dataset_val"
 
 os.makedirs(path_annotations,exist_ok=True)
 os.makedirs(os.path.join(path_annotations,'annotations'),exist_ok=True)
@@ -45,11 +45,12 @@ for i, row in labels_mitosis.iterrows():
 
 import shutil
 
-path_discards_images = 'X:\\projects\\PAIthology\\src\\processed_data\\dataset\\discards\\images'
-path_discards_annotations = 'X:\\projects\\PAIthology\\src\\processed_data\\dataset\\discards\\annotations'
-path_tiles = 'X:\\projects\\PAIthology\\src\\/processed_data\\dataset\\images'
-path_tiles_annotations = 'X:\\projects\\PAIthology\\src\\processed_data\\dataset\\annotations'
-os.makedirs('X:\\projects\\PAIthology\\src\\processed_data\\dataset\\discards\\', exist_ok=True)
+path_discards_images = 'X:\\projects\\PAIthology\\src\\processed_data\\dataset_val\\discards\\images'
+path_discards_annotations = 'X:\\projects\\PAIthology\\src\\processed_data\\dataset_val\\discards\\annotations'
+path_tiles = 'X:\\projects\\PAIthology\\src\\/processed_data\\dataset_val\\images'
+path_tiles_annotations = 'X:\\projects\\PAIthology\\src\\processed_data\\dataset_val\\annotations'
+
+os.makedirs('X:\\projects\\PAIthology\\src\\processed_data\\dataset_val\\discards\\', exist_ok=True)
 os.makedirs(path_discards_images, exist_ok=True)
 os.makedirs(path_discards_annotations, exist_ok=True)
 imgs = os.listdir(path_tiles)
@@ -63,7 +64,7 @@ for img in imgs:
                     os.path.join(path_discards_annotations, img.replace('jpg', 'xml')))
 
 
-output_dir = 'X:\\projects\\PAIthology\\src\\processed_data\\dataset\\tfrecord'
+output_dir = 'X:\\projects\\PAIthology\\src\\processed_data\\dataset_val\\tfrecord_val'
 os.makedirs(output_dir,exist_ok=True)
 
 #sys.path.append('/content/drive/MyDrive/pAItologos/src/01_GIT/automl/efficientdet/')
