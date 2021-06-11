@@ -10,7 +10,7 @@ import glob
 from src.Frames import Frame
 
 TILE_SIZE = 256
-NUM_TILES = 10
+NUM_TILES = 1
 
 #path_labels = "X:\\projects\\PAIthology\\src\\Labels.xlsx"
 
@@ -28,12 +28,15 @@ os.makedirs(os.path.join(path_annotations,'images'),exist_ok=True)
 
 labels = pd.read_excel(path_labels,dtype={"MPoint":object})
 labels_mitosis = labels[labels['Mitosis']==True].reset_index()
+labels_mitosis = labels[(labels['Mitosis']==True)].reset_index()
+labels_mitosis = labels_mitosis[(labels_mitosis['SubImage']==1)].reset_index()
 
 for i, row in labels_mitosis.iterrows():
     filename = f'{row["Combinacion"]}.tiff'
     a = os.path.join(path_images,'*','x40', filename)
     path_image = glob.glob(os.path.join(path_images,'*','x40', filename))
     if os.path.exists(path_image[0]):
+        print(i)
         print(filename)
         cells = row["MPoint"]
         cells = ast.literal_eval(cells)
