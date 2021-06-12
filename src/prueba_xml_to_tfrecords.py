@@ -42,11 +42,16 @@ for i, row in labels_mitosis.iterrows():
         cells = ast.literal_eval(cells)
         #for i in range(len(cells)):
         frame = Frame(path=path_image[0],cells=cells,tile_size=TILE_SIZE,num_tiles=NUM_TILES,path_annotations=path_annotations)
-
         frame.get_records() #peta en el primer frame con subimages
         frame.create_mask()
         frame.get_all_tiles()
         frame.create_annotations()
+
+        image_name = []
+        image_name.append(filename)
+        tile_cell_coordinates = []
+        tile_cell_coordinates.append(frame.records)
+        dataset = pd.Dataframe(zip(image_name, tile_cell_coordinates), columns=["image_name", "cell_coordinates"])
 
 import shutil
 

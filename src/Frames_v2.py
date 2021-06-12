@@ -151,6 +151,7 @@ class PatchGenerator():
     
                 individual_not_mitotic_patch = self.image[x1_not_mitotic:x2_not_mitotic, y1_not_mitotic:y2_not_mitotic, :]
                 tile_not_mitosis = Tile(individual_not_mitotic_patch)
+
                 self.frame.update_tiles_not_mitosis(tile_not_mitosis)
     
       
@@ -220,7 +221,7 @@ class Frame:
         self.tiles_not_mitosis += [tile]
         
     def create_annotations(self):
-        delta = 5
+        delta = 15
         count = 0
         for tile_mitosis in self.tiles_mitosis:
             image = tile_mitosis.tile
@@ -232,12 +233,19 @@ class Frame:
             cv2.imwrite(os.path.join(self.path_annotations,'images',f"{self.filename.replace('.tiff','')}_mitosis_{count}.jpg"),image) 
             count += 1
         count = 0
+
         for tile_not_mitosis in self.tiles_not_mitosis:
             image_not = tile_not_mitosis.tile
             tree = create_base_xml(self,image,f"{self.filename.replace('.tiff','')}_notmitosis_{count}.jpg")
             tree.write(os.path.join(self.path_annotations,'annotations',f"{self.filename.replace('.tiff','')}_notmitosis_{count}.xml"))
             cv2.imwrite(os.path.join(self.path_annotations,'images',f"{self.filename.replace('.tiff','')}_notmitosis_{count}.jpg"),image_not) 
             count += 1
+
+        def create_csv(self):
+            for tile_mitosis in self.tiles_mitosis:
+                for record in tile_mitosis.records:
+
+
 
 ## Funciones a parte ##
 def get_cell_coordinates_in_tile(x1_tile : int, y1_tile : int,x_record: int, y_record: int, confidence) -> Record:
