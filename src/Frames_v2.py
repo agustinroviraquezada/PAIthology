@@ -5,9 +5,6 @@ import cv2
 import random
 from src.xml_tools import create_base_xml, create_object_xml
 
-a = PatchGenerator()
-b = a.generate_negative_patches()
-
 class PatchGenerator():
     def __init__(self, frame, tile_size, num_tiles):
         self.tile_size = tile_size
@@ -46,8 +43,8 @@ class PatchGenerator():
             if (0 < x2_candidate[0] < x_image) \
                 and (0 < x_choice[0] +int(self.frame.tile_size/2) < x_image)\
                 and (0 < y2_candidate[0] < y_image) and (0 < y_choice[0] +int(self.frame.tile_size/2) < y_image)\
-                and (self.frame.frame_mask[y_choice[0]+int(self.frame.tile_size/2),x_choice[0]+int(self.frame.tile_size/2)] == 0)\
-                and (abs(x_choice - x2_candidate) == self.tile_size and abs(y_choice - y2_candidate == self.tile_size)):
+                and (self.frame.frame_mask[y_choice[0]+int(self.frame.tile_size/2),x_choice[0]+int(self.frame.tile_size/2)] == 0):
+
 
                 coord_x1.append(x_choice)
                 coord_y1.append(y_choice)
@@ -55,7 +52,7 @@ class PatchGenerator():
                 coord_x2.append(x2_candidate)
                 coord_y2.append(y2_candidate)
                 i += 1
-        return (coord_x1, coord_x2, coord_y1, coord_y2)
+        return coord_x1, coord_x2, coord_y1, coord_y2
 
     def generate_positive_patches(self, coordinates):
         """Generates random tiles that contain the mitotic coordinates. We pick x1 and y1
@@ -83,21 +80,11 @@ class PatchGenerator():
             #We generate x2 and y2 candidates, and we check if the mitotic coordinates are contained in the patch
             x2_candidate = x_choice + (random.choice(choice))
             y2_candidate = y_choice + (random.choice(choice))
-            a = x_mitotic-self.tile_size
-            b=x_mitotic+self.tile_size
-            prueba_1 = x2_candidate in range(a,b)
-            c=y_mitotic-self.tile_size
-            d=y_mitotic+self.tile_size
-            prueba_2 = y2_candidate in range(c,d)
-            prueba_3 = x2_candidate in range(0,x_image)
-            prueba_4 = y2_candidate in range(0,y_image)
-            prueba_5 = abs(x_choice-x2_candidate)== 256
-            prueba_6 = abs(y_choice-y2_candidate)== 256
 
             if (x2_candidate in range(0, x_image)) and (y2_candidate[0] in range(0, y_image)) \
             and (x2_candidate in range((x_mitotic - self.tile_size), (x_mitotic + self.tile_size))) \
-            and (y2_candidate in range((y_mitotic - self.tile_size), (y_mitotic + self.tile_size)))\
-            and (abs(x_choice - x2_candidate) == self.tile_size and abs(y_choice - y2_candidate == self.tile_size)):
+            and (y2_candidate in range((y_mitotic - self.tile_size), (y_mitotic + self.tile_size))):\
+
 
                 coord_x1.append(x_choice)
                 coord_y1.append(y_choice)
@@ -108,7 +95,7 @@ class PatchGenerator():
             else:
                 continue
 
-        return (coord_x1, coord_x2, coord_y1, coord_y2)
+        return coord_x1, coord_x2, coord_y1, coord_y2
     
     
 
