@@ -1,29 +1,31 @@
 import xml.etree.ElementTree as ET
 
-def create_base_xml(frame,image,name):
+def create_base_xml(original_file_path, tile, name):
   tree = ET.ElementTree()
   root = ET.Element("annotation")
   folder = ET.SubElement(root, "folder")
-  folder.text = str(frame.path)
+  folder.text = str(original_file_path)
   filename = ET.SubElement(root, "filename")
   filename.text = str(name)
   path = ET.SubElement(root, "path")
-  path.text =str(frame.path)
+  path.text =str(original_file_path)
   source = ET.SubElement(root, "source")
   ET.SubElement(source, "database").text = "Unknown"
   size = ET.SubElement(root, "size")
   width = ET.SubElement(size, "width")
-  width.text = str(int(image.shape[0]))
+  width.text = str(int(tile.image.shape[0]))
   height = ET.SubElement(size, "height")
-  height.text = str(int(image.shape[1]))
+  height.text = str(int(tile.image.shape[1]))
   depth = ET.SubElement(size, "depth")
   depth.text = str(int(3))
   segmented = ET.SubElement(root, "segmented") 
   segmented.text = '0'
   tree._setroot(root)
+  for record in tile.records:
+    create_object_xml(tree, record.generate_bndbox())
   return tree
 
-def create_object_xml(tree,coordinates):
+def create_object_xml(tree, coordinates):
   root = tree.getroot()
   obj = ET.SubElement(root, "object") 
   name = ET.SubElement(obj, "name")
