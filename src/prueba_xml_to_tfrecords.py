@@ -7,14 +7,14 @@ import cv2
 import pandas as pd
 import ast
 import glob
-from src.Frames import Frame
+from src.Frames_v2 import Frame
 
-TILE_SIZE = 256
+TILE_SIZE = 224
 NUM_TILES = 1
 
 #path_labels = "X:\\projects\\PAIthology\\src\\Labels.xlsx"
 
-path_labels = "C:\\Users\\pasto\\projects\\PAIthology\\src\\Labels.xlsx"
+path_labels = "C:\\Users\\pasto\\projects\\PAIthology\\src\\Labels_2.xlsx"
 
 #path_images = "X:\\projects\\PAIthology\\src\\raw_data"
 #path_annotations = "X:\\projects\\PAIthology\\src\\processed_data\\dataset"
@@ -30,6 +30,8 @@ labels = pd.read_excel(path_labels,dtype={"MPoint":object})
 labels_mitosis = labels[labels['Mitosis']==True].reset_index()
 labels_mitosis = labels[(labels['Mitosis']==True)].reset_index()
 labels_mitosis = labels_mitosis[(labels_mitosis['SubImage']==1)].reset_index()
+
+complete_annotations = pd.DataFrame()
 
 for i, row in labels_mitosis.iterrows():
     filename = f'{row["Combinacion"]}.tiff'
@@ -47,11 +49,14 @@ for i, row in labels_mitosis.iterrows():
         frame.get_all_tiles()
         frame.create_annotations()
 
-        image_name = []
-        image_name.append(filename)
-        tile_cell_coordinates = []
-        tile_cell_coordinates.append(frame.records)
-        dataset = pd.Dataframe(zip(image_name, tile_cell_coordinates), columns=["image_name", "cell_coordinates"])
+        df = frame.csv_annotations()
+
+        complete_annotations = complete_annotations.append(df, ignore_index=True)
+        #complete_annotations.to_csv(os.path.join(path_annotations, "annotations.csv"))
+
+
+complete_annotations.to_csv(os.path.join(path_annotations, "annotations.csv"), header=False)
+
 
 import shutil
 
@@ -74,14 +79,15 @@ imgs = os.listdir(path_tiles)
 
 for img in imgs:
     image = cv2.imread(os.path.join(path_tiles, img))
-    if image.shape != (256, 256, 3):
+    if image.shape != (TILE_SIZE, TILE_SIZE, 3):
         print(img)
         shutil.move(os.path.join(path_tiles, img), os.path.join(path_discards_images, img))
         shutil.move(os.path.join(path_tiles_annotations, img.replace('jpg', 'xml')),
                     os.path.join(path_discards_annotations, img.replace('jpg', 'xml')))
 
 
-output_dir = 'X:\\projects\\PAIthology\\src\\processed_data\\dataset\\tfrecord'
+#output_dir = 'X:\\projects\\PAIthology\\src\\processed_data\\dataset\\tfrecord'
+output_dir = 'C:\\Users\\pasto\\projects\\PAIthology\\src\\processed_data\\dataset\\tfrecord'
 os.makedirs(output_dir,exist_ok=True)
 
 #sys.path.append('/content/drive/MyDrive/pAItologos/src/01_GIT/automl/efficientdet/')

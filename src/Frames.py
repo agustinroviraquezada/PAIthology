@@ -5,9 +5,6 @@ import cv2
 import random
 from src.xml_tools import create_base_xml, create_object_xml
 
-a = PatchGenerator()
-b = a.generate_negative_patches()
-
 class PatchGenerator():
     def __init__(self, frame, tile_size, num_tiles):
         self.tile_size = tile_size
@@ -43,7 +40,7 @@ class PatchGenerator():
             y2_candidate = y_choice + (random.choice(choice))                  
             # search if choice of coordinates inside boundaries and if valid centre of \
             # coordinates. This is achieved when the value of frame.frame_mask == 0. 
-            if (0 < x2_candidate[0] < x_image) \
+            if (x2_candidate[0] < x_image) \
                 and (0 < x_choice[0] +int(self.frame.tile_size/2) < x_image)\
                 and (0 < y2_candidate[0] < y_image) and (0 < y_choice[0] +int(self.frame.tile_size/2) < y_image)\
                 and (self.frame.frame_mask[y_choice[0]+int(self.frame.tile_size/2),x_choice[0]+int(self.frame.tile_size/2)] == 0)\

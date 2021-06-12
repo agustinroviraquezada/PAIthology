@@ -1,9 +1,11 @@
 import numpy as np
 import os
+import pandas as pd
 from PIL import Image
 import cv2
 import random
 from src.xml_tools import create_base_xml, create_object_xml
+
 
 class PatchGenerator():
     def __init__(self, frame, tile_size, num_tiles):
@@ -41,10 +43,9 @@ class PatchGenerator():
             # search if choice of coordinates inside boundaries and if valid centre of \
             # coordinates. This is achieved when the value of frame.frame_mask == 0. 
             if (0 < x2_candidate[0] < x_image) \
-                and (0 < x_choice[0] +int(self.frame.tile_size/2) < x_image)\
-                and (0 < y2_candidate[0] < y_image) and (0 < y_choice[0] +int(self.frame.tile_size/2) < y_image)\
+                and (0 < x_choice[0] +int(self.frame.tile_size) < x_image)\
+                and (0 < y2_candidate[0] < y_image) and (0 < y_choice[0] +int(self.frame.tile_size) < y_image)\
                 and (self.frame.frame_mask[y_choice[0]+int(self.frame.tile_size/2),x_choice[0]+int(self.frame.tile_size/2)] == 0):
-
 
                 coord_x1.append(x_choice)
                 coord_y1.append(y_choice)
@@ -52,7 +53,7 @@ class PatchGenerator():
                 coord_x2.append(x2_candidate)
                 coord_y2.append(y2_candidate)
                 i += 1
-        return coord_x1, coord_x2, coord_y1, coord_y2
+        return (coord_x1, coord_x2, coord_y1, coord_y2)
 
     def generate_positive_patches(self, coordinates):
         """Generates random tiles that contain the mitotic coordinates. We pick x1 and y1
@@ -83,8 +84,7 @@ class PatchGenerator():
 
             if (x2_candidate in range(0, x_image)) and (y2_candidate[0] in range(0, y_image)) \
             and (x2_candidate in range((x_mitotic - self.tile_size), (x_mitotic + self.tile_size))) \
-            and (y2_candidate in range((y_mitotic - self.tile_size), (y_mitotic + self.tile_size))):\
-
+            and (y2_candidate in range((y_mitotic - self.tile_size), (y_mitotic + self.tile_size))):
 
                 coord_x1.append(x_choice)
                 coord_y1.append(y_choice)
@@ -95,7 +95,7 @@ class PatchGenerator():
             else:
                 continue
 
-        return coord_x1, coord_x2, coord_y1, coord_y2
+        return (coord_x1, coord_x2, coord_y1, coord_y2)
     
     
 
@@ -151,7 +151,6 @@ class PatchGenerator():
     
                 individual_not_mitotic_patch = self.image[x1_not_mitotic:x2_not_mitotic, y1_not_mitotic:y2_not_mitotic, :]
                 tile_not_mitosis = Tile(individual_not_mitotic_patch)
-
                 self.frame.update_tiles_not_mitosis(tile_not_mitosis)
     
       
@@ -168,8 +167,8 @@ class Tile:
 class Record:
     """Class which gathers information of the position and confidence of a cell."""
     def __init__(self, x: int, y: int, confidence: float):
-        self.x = x
-        self.y = y
+        self.x = y
+        self.y = x
         self.confidence = confidence
 
 
@@ -192,15 +191,8 @@ class Frame:
         self.frame_mask = []
         
     def get_records(self):
-        if len(self.cells) == 1:
-            cell = self.cells[0]
-            record = Record(cell[0], cell[1], cell[2])
-            self.records += [record]
-        else:
-            for i in range(len(self.cells)):
-                cell = self.cells[i]
-                record = Record(cell[0], cell[1], cell[2])
-                self.records += [record] #Aqui va bien hasta la última iteración de la primera Tile con multicelula
+        self.records = [Record(*cell) for cell in self.cells]
+        print(f'Got records for {self.filename}')
 
         
     def create_mask(self):
@@ -233,7 +225,6 @@ class Frame:
             cv2.imwrite(os.path.join(self.path_annotations,'images',f"{self.filename.replace('.tiff','')}_mitosis_{count}.jpg"),image) 
             count += 1
         count = 0
-
         for tile_not_mitosis in self.tiles_not_mitosis:
             image_not = tile_not_mitosis.tile
             tree = create_base_xml(self,image,f"{self.filename.replace('.tiff','')}_notmitosis_{count}.jpg")
@@ -241,10 +232,40 @@ class Frame:
             cv2.imwrite(os.path.join(self.path_annotations,'images',f"{self.filename.replace('.tiff','')}_notmitosis_{count}.jpg"),image_not) 
             count += 1
 
-        def create_csv(self):
-            for tile_mitosis in self.tiles_mitosis:
-                for record in tile_mitosis.records:
+    def csv_annotations(self):
+        delta = 15
+        count = 0
+        df = pd.DataFrame(columns = ["filename", "x1_left_bottom", "x2_right_bottom","y1_left_up", "y2_right_up", "classification"])
+        for tile_mitosis in self.tiles_mitosis:
+            for record in tile_mitosis.records:
+                coord_x1, coord_x2, coord_y1, coord_y2 = (record.x - delta, record.x + delta,\
+                                                          record.y - delta, record.y + delta)
+                coord_x1 = max(coord_x1, 0)
+                coord_x2 = min(coord_x2, self.tile_size)
+                coord_y1 = max(coord_y1, 0)
+                coord_y2 = min(coord_y2, self.tile_size)
+                filename = str(f"{self.filename.replace('.tiff', '')}_mitosis_{count}.jpg")
 
+                df = df.append({"filename":filename,
+                            "x1_left_bottom": coord_x1,\
+                            "x2_right_bottom": coord_x2,
+                            "y1_left_up": coord_y1,
+                            "y2_right_up": coord_y2,
+                            "classification": 1 }, ignore_index=True)
+                count += 1
+            count = 0
+            for record in self.tiles_not_mitosis:
+                filename = str(f"{self.filename.replace('.tiff', '')}_notmitosis_{count}.jpg")
+
+                df = df.append({"filename":filename,
+                                "x1_left_bottom": 0, \
+                                "x2_right_bottom": 0,
+                                "y1_left_up": 0,
+                                "y2_right_up": 0,
+                                "classification": 0}, ignore_index=True)
+                count +=1
+
+        return df
 
 
 ## Funciones a parte ##
