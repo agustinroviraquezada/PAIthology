@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+import os
 
 def create_base_xml(original_file_path, tile, name):
   tree = ET.ElementTree()
@@ -8,7 +9,7 @@ def create_base_xml(original_file_path, tile, name):
   filename = ET.SubElement(root, "filename")
   filename.text = str(name)
   path = ET.SubElement(root, "path")
-  path.text =str(original_file_path)
+  path.text =str(os.path.join(original_file_path, name))
   source = ET.SubElement(root, "source")
   ET.SubElement(source, "database").text = "Unknown"
   size = ET.SubElement(root, "size")

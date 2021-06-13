@@ -3,6 +3,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 from record import Record
 from tile import Tile
+import cv2
 
 
 class TileGenerator:
@@ -33,12 +34,12 @@ class TileGenerator:
     def get_centroid_limits(self):
         limits_random_centroid_x = (
             int(self.tile_size/2), # min limit
-            int(frame.frame.shape[0] - self.tile_size/2)  # max limit
+            int(self.image_frame.shape[0] - self.tile_size/2)  # max limit
         )
 
         limits_random_centroid_y = (
             int(self.tile_size/2), # min limit
-            int(frame.frame.shape[1] - self.tile_size/2)  # max limit
+            int(self.image_frame.shape[1] - self.tile_size/2)  # max limit
         )
 
         return limits_random_centroid_x, limits_random_centroid_y
