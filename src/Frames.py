@@ -35,8 +35,9 @@ class Frame:
         for record in self.records:
             mask_per_record = np.zeros(self.frame.shape[:2], np.uint8)
             # This could use floor and ceiling to also work with odd tile sizes
-            mask[int(record.x-(self.tile_size/2)):int(record.x+(self.tile_size/2)),
-                 int(record.y-(self.tile_size/2)):int(record.y+(self.tile_size/2))] = 1
+            # This could use floor and ceiling to also work with odd tile sizes
+            mask[max(int(record.x-(self.tile_size/2)), 0):min(int(record.x+(self.tile_size/2)), self.frame.shape[0]),
+                 max(int(record.y-(self.tile_size/2)), 0):min(int(record.y+(self.tile_size/2)), self.frame.shape[1])] = 1
             
             mask_per_record[int(record.x-(self.tile_size/2)):int(record.x+(self.tile_size/2)),
                  int(record.y-(self.tile_size/2)):int(record.y+(self.tile_size/2))] = 1
