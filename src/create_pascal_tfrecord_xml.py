@@ -112,9 +112,9 @@ def dict_to_tf_example(data, image_dir, label_map_dict):
 def main(_):
     # I was unable to use the flags and run this from the command line, so I eliminated them and plugged in the paths on my
     # machine. Change as needed
-    output_dir = "X:\\projects\\PAIthology\\src\\processed_data\\dataset\\tfrecord\\tfrecord"
-    image_dir = 'X:\\projects\\PAIthology\\src\\/processed_data\\dataset\\images'
-    annotations_dir = 'X:\\projects\\PAIthology\\src\\processed_data\\dataset\\annotations'
+    output_dir = "X:\\projects\\PAIthology\\src\\processed_data\\dataset_val\\tfrecord_val\\tfrecord_val"
+    image_dir = 'X:\\projects\\PAIthology\\src\\processed_data\\dataset_val\\images'
+    annotations_dir = 'X:\\projects\\PAIthology\\src\\processed_data\\dataset_val\\annotations'
 
     writer = tf.io.TFRecordWriter(output_dir)
     #label_map_dict = label_map_util.get_label_map_dict(FLAGS.label_map_path)
@@ -144,10 +144,10 @@ def main(_):
 if __name__ == '__main__':
 
     app.run(main)
-    #el record tiene 13834 elementos, para el train/test split
+    #el record tiene 13834 elementos para train
 
-    """tf.compat.v1.enable_eager_execution
-    print(sum(1 for _ in tf.data.TFRecordDataset("X:\\projects\\PAIthology\\src\\processed_data\\dataset\\tfrecord\\tfrecord")))"""
+    tf.compat.v1.enable_eager_execution
+    print(sum(1 for _ in tf.data.TFRecordDataset("X:\\projects\\PAIthology\\src\\processed_data\\dataset_test\\tfrecord_test\\tfrecord")))
 
     """raw_dataset = tf.data.TFRecordDataset(
         "X:\\projects\\PAIthology\\src\\processed_data\\dataset\\tfrecord\\tfrecord")

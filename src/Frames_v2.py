@@ -236,6 +236,7 @@ class Frame:
         delta = 15
         count = 0
         df = pd.DataFrame(columns = ["filename", "x1_left_bottom", "x2_right_bottom","y1_left_up", "y2_right_up", "classification"])
+
         for tile_mitosis in self.tiles_mitosis:
             for record in tile_mitosis.records:
                 coord_x1, coord_x2, coord_y1, coord_y2 = (record.x - delta, record.x + delta,\
@@ -245,16 +246,18 @@ class Frame:
                 coord_y1 = max(coord_y1, 0)
                 coord_y2 = min(coord_y2, self.tile_size)
                 filename = str(f"{self.filename.replace('.tiff', '')}_mitosis_{count}.jpg")
+                classification = 1
 
                 df = df.append({"filename":filename,
                             "x1_left_bottom": coord_x1,\
                             "x2_right_bottom": coord_x2,
                             "y1_left_up": coord_y1,
                             "y2_right_up": coord_y2,
-                            "classification": 1 }, ignore_index=True)
+                            "classification": classification }, ignore_index=True)
                 count += 1
-            count = 0
-            for record in self.tiles_not_mitosis:
+
+        count = 0
+        for tile_not_mitosis in self.tiles_not_mitosis:
                 filename = str(f"{self.filename.replace('.tiff', '')}_notmitosis_{count}.jpg")
 
                 df = df.append({"filename":filename,
